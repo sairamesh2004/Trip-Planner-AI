@@ -1,4 +1,4 @@
-# ✈️ Travel Planner AI
+# ✈️ Trip Planner AI
 
 An AI-powered travel planning application that helps users generate personalized travel itineraries using Google Gemini AI. The application allows users to create accounts, chat with an AI assistant, save travel plans, upload trip images, and organize travel memories.
 
