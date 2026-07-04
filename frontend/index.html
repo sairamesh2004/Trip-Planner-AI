@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel ChatBot AI | Travel Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-blue: #0f3460;
+            --sky-blue: #e0f7fa;
+            --sunset-orange: #e94560;
+            --sand-beige: #f8f5f2;
+            --passport-navy: #16213e;
+            --forest-green: #2a9d8f;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --border: rgba(0,0,0,0.08);
+            --font-head: 'Montserrat', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(rgba(15, 52, 96, 0.6), rgba(22, 33, 62, 0.7)), 
+                        url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1500px;
+            height: 92vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--passport-navy);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s ease;
+            position: absolute;
+            height: 100%;
+            z-index: 100;
+            left: -320px;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+        }
+        .sidebar.active { left: 0; }
+
+        .sidebar-header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .trips-list { flex: 1; overflow-y: auto; padding: 20px; }
+
+        .trip-item {
+            background: white;
+            color: #333;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            border-left: 5px solid var(--sunset-orange);
+            padding: 15px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .trip-item:hover { transform: translateX(5px); }
+        .trip-item::after {
+            content: '✈';
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 20px;
+            color: #eee;
+        }
+
+        .new-chat-btn {
+            margin: 20px; padding: 15px;
+            background: var(--sunset-orange); color: white;
+            border: none; border-radius: 12px;
+            cursor: pointer; font-family: var(--font-head); font-weight: 600;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1; display: flex; flex-direction: column;
+            background: #ffffff;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand-title {
+            font-family: var(--font-head); font-weight: 800; font-size: 22px;
+            color: var(--ocean-blue);
+        }
+
+        /* Messages */
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 40px;
+            display: flex; flex-direction: column; gap: 20px;
+            background-image: radial-gradient(#00000008 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .message { display: flex; max-width: 80%; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .message.user { align-self: flex-end; }
+        .message.assistant { align-self: flex-start; }
+
+        .message-content {
+            padding: 18px 25px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .message.user .message-content {
+            background: var(--ocean-blue); color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white; color: #333;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        /* --- BEAUTIFUL RESPONSE STYLING (No Special Characters) --- */
+        .chat-heading {
+            color: var(--sunset-orange);
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 1.15em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            display: block;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .chat-bold {
+            color: var(--ocean-blue);
+            font-weight: 700;
+        }
+
+        .chat-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+        
+        .chat-list-icon {
+            color: var(--forest-green);
+            font-size: 12px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        /* --------------------------------------------------------- */
+
+        .chat-input-area { padding: 25px; border-top: 1px solid var(--border); }
+        .input-wrapper {
+            background: var(--sand-beige); border-radius: 30px;
+            padding: 8px; display: flex; align-items: center; gap: 10px;
+            border: 1px solid var(--border);
+        }
+        .chat-input { flex: 1; border: none; background: transparent; padding: 12px; outline: none; font-size: 15px; }
+        
+        .icon-btn {
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; transition: 0.2s;
+        }
+        .send-btn { background: var(--ocean-blue); color: white; }
+        .send-btn:hover { transform: scale(1.1); }
+        .attach-btn { background: transparent; color: #666; }
+
+        /* Modal */
+        .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); }
+        .modal-content { background:white; margin:5% auto; width:80%; max-width:800px; max-height:85vh; overflow-y:auto; border-radius:15px; padding: 30px; position: relative; }
+        
+        /* Upload Panel */
+        .upload-panel { display: none; margin-bottom: 15px; background: var(--sand-beige); padding: 15px; border-radius: 12px; border: 2px dashed #ccc; }
+        .upload-panel.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div>
+                    <h2 style="font-family: var(--font-head);">PASSPORT</h2>
+                    <p style="font-size:12px; opacity:0.7;">My Travel History</p>
+                </div>
+                <button onclick="toggleSidebar()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="trips-list" id="tripsList"></div>
+            <button class="new-chat-btn" onclick="newChat()"><i class="fas fa-plus-circle"></i> New Adventure</button>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div style="display:flex; align-items:center;">
+                    <button onclick="toggleSidebar()" style="background:none; border:none; font-size:24px; color:var(--ocean-blue); cursor:pointer; margin-right:15px;"><i class="fas fa-bars"></i></button>
+                    <div class="brand-title"><i class="fas fa-plane-departure"></i> Travel ChatBot.AI</div>
+                </div>
+                <div style="display:flex; align-items:center; gap: 15px;">
+                    <span id="greeting" style="font-size: 14px; font-weight: 500;">Hello, Traveler</span>
+                    <button onclick="logout()" style="border:none; background:none; color:var(--sunset-orange); cursor:pointer; font-weight:600;">Logout</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    <div class="message-content">
+                        <span class="chat-heading">🌍 Ready for your next adventure?</span>
+                        <div>I'm your personal travel AI. I can help you:</div>
+                        
+                        <div class="chat-list-item">
+                            <i class="fas fa-map-marked-alt chat-list-icon"></i>
+                            <span>Plan detailed itineraries</span>
+                        </div>
+                        <div class="chat-list-item">
+                            <i class="fas fa-camera chat-list-icon"></i>
+                            <span>Organize your travel photos</span>
+                        </div>
+                        
+                        <div style="margin-top: 15px;">Where would you like to go today?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="upload-panel" id="imageUploadSection">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <strong><i class="fas fa-camera"></i> Trip Gallery</strong>
+                        <button onclick="cancelUpload()" style="border:none; background:none; cursor:pointer;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <input type="text" id="tripNameInput" placeholder="Name this memory (e.g. Paris_2024)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+                    <div id="imagePreview" style="display:flex; gap:10px; margin-bottom:10px;"></div>
+                    <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="previewImages()">
+                    <button onclick="document.getElementById('imageInput').click()" style="padding:8px 15px; background:#eee; border:none; border-radius:5px; cursor:pointer;">Select Photos</button>
+                    <button onclick="uploadImages()" style="padding:8px 15px; background:var(--forest-green); color:white; border:none; border-radius:5px; cursor:pointer;">Upload & Save</button>
+                </div>
+
+                <div class="input-wrapper">
+                    <button class="icon-btn attach-btn" onclick="showImageUpload()"><i class="fas fa-paperclip"></i></button>
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type destination or 'Save trip'..." onkeypress="handleKeyPress(event)">
+                    <button class="icon-btn send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    <button class="icon-btn attach-btn" onclick="saveCurrentTrip()" title="Save Itinerary" style="color: var(--sunset-orange);"><i class="fas fa-save"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="tripModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeModal()" style="position:absolute; right:20px; top:20px; cursor:pointer; font-size:24px; z-index:100;">&times;</span>
+            <div id="tripDetailsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let sessionId = 'session_' + Date.now();
+        // Ensure we default to demo_user if null to prevent 500 errors in backend
+        let userId = localStorage.getItem('user_id');
+        if (!userId || userId === 'undefined') userId = 'demo_user';
+        
+        let userName = localStorage.getItem('user_name') || 'Traveler';
+        let selectedFiles = [];
+
+        window.onload = () => {
+            updateGreeting();
+            loadTrips();
+        };
+
+        function updateGreeting() {
+            const h = new Date().getHours();
+            let g = 'Welcome';
+            if (h < 12) g = 'Good Morning';
+            else if (h < 18) g = 'Good Afternoon';
+            else g = 'Good Evening';
+            document.getElementById('greeting').innerText = `${g}, ${userName}`;
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        function logout() { localStorage.clear(); window.location.href='login.html'; }
+
+        /* --- MAGIC TEXT FORMATTER --- */
+        function formatMessageText(text) {
+            if (!text) return "";
+            let formatted = text;
+
+            // 1. Headers: ### Title -> Styled Header
+            formatted = formatted.replace(/###\s*(.*?)(?:\n|$)/g, '<span class="chat-heading">$1</span>');
+            
+            // 2. Bold: **Text** -> Styled Bold
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<span class="chat-bold">$1</span>');
+            
+            // 3. Lists: - Item or * Item -> Flex row with icon
+            formatted = formatted.replace(/^\s*[-*•]\s+(.*?)(?:\n|$)/gm, 
+                '<div class="chat-list-item"><i class="fas fa-check-circle chat-list-icon"></i><span>$1</span></div>');
+            
+            // 4. Newlines
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            return formatted;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+            
+            addMessage(msg, 'user');
+            input.value = '';
+            
+            try {
+                // Ensure user_id is sent as string
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        message: msg, 
+                        session_id: sessionId, 
+                        user_id: String(userId) 
+                    })
+                });
+                
+                if (!response.ok) throw new Error("API Error");
+
+                const data = await response.json();
+                addMessage(data.response, 'assistant');
+                
+                if(data.has_storage_command) {
+                    if(data.trip_name) document.getElementById('tripNameInput').value = data.trip_name;
+                    showImageUpload();
+                }
+            } catch(e) { 
+                console.error(e);
+                addMessage("I'm having trouble connecting to the travel server. Please check if the backend is running.", 'assistant'); 
+            }
+        }
+
+        function addMessage(text, role) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            const content = role === 'assistant' ? formatMessageText(text) : text;
+            div.innerHTML = `<div class="message-content">${content}</div>`;
+            const container = document.getElementById('chatMessages');
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        /* --- TRIP MANAGEMENT (Fixes 500 Error) --- */
+        async function loadTrips() {
+            try {
+                // Fixed: Explicitly passing user_id
+                const res = await fetch(`${API_URL}/trips?user_id=${userId}`);
+                if (!res.ok) throw new Error("Failed to load trips");
+                
+                const data = await res.json();
+                const list = document.getElementById('tripsList');
+                list.innerHTML = '';
+                
+                if(!data.trips || data.trips.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; opacity:0.7; padding:20px; color:white;">No trips saved yet.</div>';
+                    return;
+                }
+                
+                data.trips.forEach(trip => {
+                    const el = document.createElement('div');
+                    el.className = 'trip-item';
+                    el.onclick = () => viewTripDetails(trip.trip_name);
+                    el.innerHTML = `<h4>${trip.trip_name}</h4><p style="font-size:12px; margin-top:5px; opacity:0.8">${trip.destination}</p>`;
+                    list.appendChild(el);
+                });
+            } catch(e) { console.error("Load Trips Error:", e); }
+        }
+
+        async function viewTripDetails(tripName) {
+            try {
+                // Fixed: Explicitly passing user_id
+                const res = await fetch(`${API_URL}/trip/${tripName}?user_id=${userId}`);
+                const data = await res.json();
+                
+                const formattedPlan = formatMessageText(data.plan_details);
+                
+                let html = `<h2 style="color:var(--ocean-blue); margin-bottom:10px;">${data.trip_name}</h2>
+                            <p style="margin-bottom:20px; color:#666;"><i class="fas fa-map-pin"></i> ${data.destination}</p>
+                            <div style="background:#f9f9f9; padding:20px; border-radius:10px; margin-bottom:20px;">${formattedPlan}</div>`;
+                
+                if(data.images && data.images.length > 0) {
+                    html += '<h3 style="margin-bottom:15px; color:var(--sunset-orange);">Trip Gallery</h3><div style="display:flex; flex-wrap:wrap; gap:15px;">';
+                    data.images.forEach(img => {
+                        html += `
+                            <div style="text-align:center;">
+                                <img src="${img.data}" style="height:120px; width:120px; object-fit:cover; border-radius:10px; box-shadow:0 3px 6px rgba(0,0,0,0.16);">
+                                <div style="font-size:11px; margin-top:5px; color:#666;">${img.category}</div>
+                            </div>`;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<p style="font-style:italic; color:#999;">No photos saved for this trip.</p>';
+                }
+
+                document.getElementById('tripDetailsContent').innerHTML = html;
+                document.getElementById('tripModal').style.display = 'block';
+            } catch(e) { alert('Error loading trip details'); }
+        }
+
+        async function saveCurrentTrip() {
+            const tripName = prompt("Name your adventure (e.g., Tokyo 2024):");
+            if(!tripName) return;
+            const dest = prompt("Destination:");
+            
+            // Extract text from chat bubbles
+            const messages = Array.from(document.querySelectorAll('.message.assistant .message-content'))
+                                  .map(m => m.innerText).join('\n\n'); 
+            
+            if (!messages) { alert("Nothing to save yet! Chat with me first."); return; }
+
+            // Using FormData matching backend expectation
+            const formData = new FormData();
+            formData.append('trip_name', tripName);
+            formData.append('destination', dest);
+            formData.append('plan_details', messages);
+            formData.append('user_id', userId);
+            
+            try {
+                await fetch(`${API_URL}/save-trip-plan`, { method:'POST', body: formData });
+                loadTrips();
+                alert("Trip Saved Successfully!");
+            } catch(e) { alert("Failed to save trip"); }
+        }
+
+        // Image Upload Logic
+        function showImageUpload() { document.getElementById('imageUploadSection').classList.add('active'); }
+        function cancelUpload() { 
+            document.getElementById('imageUploadSection').classList.remove('active'); 
+            selectedFiles = [];
+            document.getElementById('imagePreview').innerHTML = '';
+        }
+        function previewImages() {
+            selectedFiles = Array.from(document.getElementById('imageInput').files);
+            const div = document.getElementById('imagePreview');
+            div.innerHTML = '';
+            selectedFiles.forEach(f => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(f);
+                img.style.height = '60px'; img.style.borderRadius = '5px';
+                div.appendChild(img);
+            });
+        }
+        async function uploadImages() {
+            const name = document.getElementById('tripNameInput').value;
+            if(!name || selectedFiles.length === 0) return alert("Please enter a name and select photos");
+            
+            const formData = new FormData();
+            formData.append('trip_name', name);
+            formData.append('user_id', userId);
+            selectedFiles.forEach(f => formData.append('files', f));
+            
+            addMessage("Uploading and analyzing photos... 📸", 'assistant');
+            try {
+                const res = await fetch(`${API_URL}/upload-images`, { method:'POST', body: formData });
+                const data = await res.json();
+                
+                let msg = `Saved ${data.images.length} photos! We found: `;
+                const categories = data.images.map(i => i.category).join(', ');
+                msg += categories;
+                
+                addMessage(msg, 'assistant');
+                cancelUpload(); 
+                loadTrips();
+            } catch(e) { addMessage("Failed to upload photos.", 'assistant'); }
+        }
+
+        function handleKeyPress(e) { if(e.key === 'Enter') sendMessage(); }
+        function closeModal() { document.getElementById('tripModal').style.display='none'; }
+        function newChat() { sessionId = 'sess_'+Date.now(); document.getElementById('chatMessages').innerHTML=''; }
+    </script>
+</body>
+</html>
