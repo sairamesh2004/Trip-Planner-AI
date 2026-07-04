@@ -1,0 +1,21 @@
+# Backend Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# Database
+sqlalchemy==2.0.35
+
+# File Uploads
+python-multipart==0.0.12
+
+# AI
+google-generativeai==0.8.3
+
+# Image Processing
+pillow==11.0.0
+
+# Validation
+pydantic==2.9.2
+
+# Environment Variables
+python-dotenv==1.0.1
