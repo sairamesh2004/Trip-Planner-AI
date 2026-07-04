@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Chatbot - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #333;
+            --input-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Travel themed background with overlay */
+            background: linear-gradient(rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.6)), 
+                        url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=2021&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-header {
+            background: transparent;
+            padding: 40px 30px 20px 30px;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .auth-header i {
+            font-size: 40px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #4a4a4a;
+        }
+
+        .auth-header p {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .auth-body {
+            padding: 30px;
+        }
+
+        /* Tabs */
+        .tab-buttons {
+            display: flex;
+            background: rgba(0,0,0,0.05);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #666;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Forms */
+        .auth-form { display: none; }
+        .auth-form.active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group { margin-bottom: 20px; position: relative; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 600;
+            font-size: 13px;
+            margin-left: 5px;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 14px 14px 40px; /* Padding left for icon */
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--input-bg);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Messages */
+        .error-message, .success-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            text-align: center;
+        }
+        .error-message { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .success-message { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .show { display: block; animation: shake 0.3s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        .divider span { padding: 0 10px; }
+
+        .demo-login {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        .demo-login:hover { border-color: #667eea; }
+
+        .demo-btn {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: 0.3s;
+        }
+        .demo-btn:hover { background: #667eea; color: white; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-container { border-radius: 0; height: 100vh; max-width: 100%; border: none; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <i class="fas fa-plane-departure"></i>
+            <h1>Start Your Journey</h1>
+            <p>AI-Powered Travel Planning</p>
+        </div>
+
+        <div class="auth-body">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        <span class="toggle-password" onclick="togglePassword('loginPassword')"><i class="fas fa-eye"></i></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Login to Continue</button>
+
+                <div class="form-footer">
+                    <p>New here? <a href="#" onclick="switchTab('signup'); return false;" style="color: #667eea; font-weight: 700; text-decoration: none;">Create Account</a></p>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" placeholder="John Doe" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="Create password (min 6 chars)" required minlength="6">
+                        <span class="toggle-password" onclick="togglePassword('signupPassword')"><i class="fas fa-eye"></i></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-check-circle"></i>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm password" required>
+                        <span class="toggle-password" onclick="togglePassword('signupConfirmPassword')"><i class="fas fa-eye"></i></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Start My Adventure</button>
+
+                <div class="form-footer">
+                    <p>Already a traveler? <a href="#" onclick="switchTab('login'); return false;" style="color: #667eea; font-weight: 700; text-decoration: none;">Login</a></p>
+                </div>
+            </form>
+
+            <!-- Demo Login Section -->
+            <div class="divider">
+                <span>Or explore as guest</span>
+            </div>
+
+            <div class="demo-login">
+                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Just want to look around?</p>
+                <button class="demo-btn" onclick="demoLogin()">
+                    <i class="fas fa-user-secret"></i> Continue as Guest
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Original Javascript Logic Preserved -->
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update forms
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+            });
+
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('signupForm').classList.add('active');
+            }
+
+            // Clear messages
+            hideMessages();
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => hideMessages(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            setTimeout(() => hideMessages(), 5000);
+        }
+
+        function hideMessages() {
+            const err = document.getElementById('errorMessage');
+            const succ = document.getElementById('successMessage');
+            if(err) err.classList.remove('show');
+            if(succ) succ.classList.remove('show');
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideMessages();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user info
+                    localStorage.setItem('user_token', data.token);
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('user_name', data.name);
+                    localStorage.setItem('user_email', data.email);
+
+                    showSuccess('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showError(data.detail || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                showError('Connection error. Please make sure the server is running.');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            hideMessages();
+
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showError('Passwords do not match!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Account created successfully! Please login.');
+                    setTimeout(() => {
+                        switchTab('login');
+                        // Helper to find the login tab button and activate it visually if needed
+                        document.querySelector('.tab-btn:first-child').click();
+                        document.getElementById('loginEmail').value = email;
+                    }, 1500);
+                } else {
+                    showError(data.detail || 'Signup failed. Please try again.');
+                }
+            } catch (error) {
+                showError('Connection error. Please make sure the server is running.');
+                console.error('Signup error:', error);
+            }
+        }
+
+        function demoLogin() {
+            // Set demo user
+            localStorage.setItem('user_token', 'demo_token');
+            localStorage.setItem('user_id', 'demo_user');
+            localStorage.setItem('user_name', 'Guest Traveler');
+            localStorage.setItem('user_email', 'demo@travel.com');
+
+            showSuccess('Logging in as guest...');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // Check if already logged in
+        window.onload = () => {
+            const token = localStorage.getItem('user_token');
+            if (token) {
+                // Uncomment to auto-redirect if already logged in
+                // window.location.href = 'index.html';
+            }
+        };
+    </script>
+</body>
+</html>
